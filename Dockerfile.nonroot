@@ -1,0 +1,26 @@
+# Same base image as Scenario 1
+FROM node:20
+
+WORKDIR /app
+
+# Create a dedicated system group and user before copying any files.
+# System accounts (-r) have lower numeric IDs and no home directory.
+# This user will own and run only this application -- nothing else.
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
+# Copy files and install dependencies while still operating as root.
+# npm install requires write access to system directories that appuser
+# would not have, so this must happen before the USER switch.
+COPY . .
+RUN npm install
+
+# Transfer ownership of everything in /app to appuser.
+# Without this, the files are owned by root and appuser cannot read them.
+RUN chown -R appuser:appuser /app
+
+# Switch the active user. Every instruction from this point forward --
+# including the CMD that starts the server -- runs as appuser.
+USER appuser
+
+EXPOSE 3000
+CMD ["npm", "start"]
