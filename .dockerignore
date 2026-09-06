@@ -1,0 +1,41 @@
+# Git history
+# The .git folder contains a complete record of every commit ever made,
+# including secrets that were added and later deleted. Removing a file
+# from git does not erase it from history -- it remains fully readable
+# inside the .git folder.
+.git
+.gitignore
+
+# Node dependencies
+# These are reinstalled fresh during RUN npm install inside the container.
+# Including them adds hundreds of megabytes to the build context
+# and provides no benefit.
+node_modules
+
+# Secrets
+# This is the most important section. Files matching any of these patterns
+# will never be copied into any image layer. If a .env file reaches
+# your image, every credential inside it is readable by anyone
+# who can pull the image from a registry.
+.env
+.env.local
+.env.production
+.env.*
+*.pem
+*.key
+*.cert
+*.p12
+
+# Docker files
+# There is no reason to ship the Dockerfile inside the image it produces.
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Documentation
+README.md
+*.md
+
+# Operating system metadata files
+.DS_Store
+Thumbs.db
