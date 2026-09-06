@@ -1,0 +1,9 @@
+{
+  "name": "docker-security-demo",
+  "version": "1.0.0",
+  "description": "Minimal app to demonstrate Docker security concepts",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  }
+}
