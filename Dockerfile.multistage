@@ -1,0 +1,55 @@
+# ---------------------------------------------------------------
+# STAGE 1 -- BUILDER
+#
+# This stage installs all dependencies and prepares the application.
+# It uses the full Node.js image with npm, compilers, and all tools.
+# This stage does NOT appear in the final image. Docker discards it
+# entirely once the build completes.
+# ---------------------------------------------------------------
+FROM node:20 AS builder
+
+WORKDIR /build
+
+# Copy package.json before copying source code.
+# npm install is only re-run when package.json changes.
+# Editing app.js will NOT trigger a reinstall. This is the correct order.
+COPY package.json ./
+
+# Install dependencies inside the builder stage.
+# npm, the Node.js build toolchain, and all compiled binaries
+# remain here and are discarded with this stage.
+RUN npm install
+
+# Copy the application source code after dependencies are installed.
+COPY app.js .
+
+
+# ---------------------------------------------------------------
+# STAGE 2 -- RUNTIME
+#
+# This is the only stage that ships to production.
+# It starts from a clean, minimal image with no build tools.
+# Only files explicitly copied from the builder stage are present.
+# ---------------------------------------------------------------
+FROM node:20-slim
+
+WORKDIR /app
+
+# Create a non-root user in the clean runtime image.
+# Same pattern as Scenario 2.
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
+# Copy only what the application needs to run.
+# The --from=builder flag tells Docker to source these files
+# from the builder stage, not from your local filesystem.
+# npm, the package cache, compilers, and everything else
+# in /build that was not listed here is permanently gone.
+COPY --from=builder /build/app.js ./app.js
+
+
+# Transfer ownership and switch to non-root user.
+RUN chown -R appuser:appuser /app
+USER appuser
+
+EXPOSE 3000
+CMD ["node", "app.js"]
