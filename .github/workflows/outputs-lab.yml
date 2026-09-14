@@ -1,0 +1,42 @@
+name: Step and Job Outputs Lab
+on:
+  workflow_dispatch:
+
+jobs:
+  # =================================
+  # JOB 1: BUILD
+  # =================================
+  build:
+    runs-on: ubuntu-latest
+    # Expose the step output as a job output
+    outputs:
+      image_tag: ${{ steps.generate.outputs.image_tag }}
+    steps:
+      # -----------------------------
+      # STEP 1
+      # -----------------------------
+      - name: Generate Image Tag
+        id: generate
+        run: |
+          echo "image_tag=app:v1.0" >> "$GITHUB_OUTPUT"
+
+      # -----------------------------
+      # STEP 2
+      # -----------------------------
+      - name: Display Image Tag
+        run: |
+          echo "The image is ${{ steps.generate.outputs.image_tag }}"
+
+  # =================================
+  # JOB 2: SECURITY
+  # =================================
+  security:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      # -----------------------------
+      # STEP 1
+      # -----------------------------
+      - name: Security Scan
+        run: |
+          echo "Scanning image: ${{ needs.build.outputs.image_tag }}"
