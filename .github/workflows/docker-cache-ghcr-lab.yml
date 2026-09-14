@@ -76,6 +76,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:${{ needs.build.outputs.image_tag }}
+          tags: ghcr.io/missnuella/docker-labs:${{ needs.build.outputs.image_tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
