@@ -30,7 +30,7 @@ jobs:
       - name: Generate Image Tag
         id: generate
         run: |
-          echo "image_tag=app:v1.0" >> "$GITHUB_OUTPUT"
+          echo "image_tag=app-v1.0" >> "$GITHUB_OUTPUT"
 
 
   security:
